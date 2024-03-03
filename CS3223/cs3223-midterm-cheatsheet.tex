@@ -95,8 +95,6 @@
 
   \subsection{Magnetic HDD}
 
-  \includegraphics[width=0.9\linewidth]{cs3223-magnetic-hdd.png} 
-
   \begin{itemize}
     \item \textbf{disk access time} =
       \begin{itemize}
@@ -110,9 +108,6 @@
       \end{itemize}
     \item \textbf{response time} for disk access = queuing delay+access time
   \end{itemize}
-
-  \includegraphics[width=0.15\linewidth]{cs3223-dbms-storage.png} 
-  \includegraphics[width=0.8\linewidth]{cs3223-access-time-example.png} 
 
   \begin{itemize}
     \item command processing time: interpreting access command by disk controller (part of access time, considered negligible)
@@ -651,75 +646,6 @@
       \end{itemize}
   \end{itemize}
 
-  \subsection{sort-merge join}
-
-  \begin{itemize}
-    \item sort R \& S: $2|R| (\log_m(N_R)+1) + 2|S| (\log_m(N_S)+1)$
-    \item merge cost: $|R| + |S| \quad$ (worst case $|R| + ||R||\times|S|$)
-  \end{itemize}
-
-  \textbf{optimised sort-merge join}
-
-  \begin{itemize}
-    \item merge sorted runs until $B > N(R, i) + N(S, j)$; then do merge and join at the same time
-    \item I/O cost: $3 \times (|R|+|S|)$
-      \begin{itemize}
-        \item if $B > \sqrt{2|S|}$, one pass to merge initial sorted runs
-        \item $2(|R|+|S|)$ for initial sorted runs, $|R|+|S|$ for merging
-      \end{itemize}
-  \end{itemize}
-
-  \subsection{hash join}
-
-  \begin{enumerate}
-    \item partition $R$ and $S$ into $k$ partitions on join column
-      \begin{itemize}
-        \item $\pi_A(R_i) \cap \pi_B(S_j) = \emptyset \quad \forall R_i, S_j, i \neq j$
-        \item $R = R_1 \cup R_2 \cup \dots \cup R_k, \quad t \in R_i \iff h(t.A)=i$
-        \item $S = S_1 \cup S_2 \cup \dots \cup S_k, \quad t \in S_i \iff h(t.B)=i$
-      \end{itemize}
-    \item join corresponding partitions: $R \bowtie_{R.A=S.B} S = (R_1 \bowtie S_1) \cup \dots \cup (R_k \bowtie S_k)$
-  \end{enumerate}
-
-  \subsubsection{Grace hash join}
-
-  for \textit{build relation} $R$ and \textit{probe relation} $S$,
-  \begin{enumerate}
-    \item \textbf{partition} $R$ and $S$ into  $k$ partitions each, $k=B-1$
-    \item \textbf{probing phase}: hash $r \in R_i$ with $h'(r.A)$ to table $T$
-      \begin{enumerate}
-        \item $\forall s \in S_i$, $r \in$ bucket $h'(s.B)$: output ($r,s$) if match
-      \end{enumerate}
-  \end{enumerate}
-
-  \begin{itemize}
-    \item I/O cost: $3(|R|+|S|) \quad$ (no partition overflow)
-    \item $B > \frac{f \times |R|}{B-1} + 2$ (input \& output buffer) $\approx B > \sqrt{f\times |R|}$
-      \begin{itemize}
-        \item during probing, $B >$ size of each partition $+ 2$
-      \end{itemize}
-    \item \textbf{partition overflow} if $R_i$ cannot fit in memory
-      \begin{itemize}
-        \item recursively apply partitioning to overflow partition
-      \end{itemize}
-  \end{itemize}
-
-  \subsection{General join conditions}
-
-  \begin{itemize}
-    \item \textbf{multiple equality-join} conditions: $(R.A = S.A) \land (R.B=S.B)$
-      \begin{itemize}
-        \item index nested loop join: use index on some/all join attribs
-        \item sort-merge join: sort on \textit{combination} of attributes
-        \item other algos: no change
-      \end{itemize}
-    \item \textbf{inequality-join} conditions: $(R.A<S.A)$
-      \begin{itemize}
-        \item index nested loop join: requires B$^+$-tree index
-        \item not applicable: sort-merge join (too much rewinding), hash-based joins
-        \item other algos: no change
-      \end{itemize}
-  \end{itemize}
 
   \section{NOTATION}
 
